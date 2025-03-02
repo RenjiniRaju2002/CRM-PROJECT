@@ -64,6 +64,22 @@ class StudentsView(View):
                 
                 students = Students.objects.filter(Q(active_status = True)& (Q(first_name__icontains=query)|Q(last_name__icontains =query)|Q(adm_num__icontains=query)|Q(contact_num__icontains=query)|Q(house_name__icontains=query)|Q(post_office__icontains=query)|Q(pincode__icontains=query)|Q(course__code__icontains=query)))
             
+        if role in ['Academic_counselor']:
+            
+            students = Students.objects.filter(active_status =True,academic_counselor__profile =request.user)
+            
+            if query:
+                
+                students = Students.objects.filter(Q(active_status = True)& Q(academic_counselor__profile =request.user) & (Q(first_name__icontains=query)|Q(last_name__icontains =query)|Q(adm_num__icontains=query)|Q(contact_num__icontains=query)|Q(house_name__icontains=query)|Q(post_office__icontains=query)|Q(pincode__icontains=query)|Q(course__code__icontains=query))) 
+        
+        else:       
+            
+            students =Students.objects.filter(active_status =True)
+        
+            if query:
+                
+                students = Students.objects.filter(Q(active_status = True)& (Q(first_name__icontains=query)|Q(last_name__icontains =query)|Q(adm_num__icontains=query)|Q(contact_num__icontains=query)|Q(house_name__icontains=query)|Q(post_office__icontains=query)|Q(pincode__icontains=query)|Q(course__code__icontains=query)))
+            
         
         
         data ={'students':students,'query':query}

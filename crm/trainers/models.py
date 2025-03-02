@@ -6,7 +6,7 @@ from students.models import BaseClass,DistrictChoices
 
 class Trainers(BaseClass):
     
-    profile =models.OneToOneField('authentication.profile',on_delete=models.CASCADE)
+    profile =models.OneToOneField('authentication.profile',on_delete=models.CASCADE, null=True, blank=True)
 
     first_name = models.CharField(max_length=25)
 

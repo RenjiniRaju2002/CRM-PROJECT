@@ -70,9 +70,11 @@ class StudentRegisterform(forms.ModelForm):
        
        email = cleaned_data.get('email')
        
-       if Students.objects.filter(profile__username = email).exists():
+       if not self.instance.uuid:
            
-           self.add_error('email','This email is already registerd')
+            if Students.objects.filter(profile__username = email).exists():
+
+                    self.add_error('email','This email is already registerd')
        
        if len(pincode)<6:
            
