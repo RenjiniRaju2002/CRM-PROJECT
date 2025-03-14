@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect ,get_list_or_404# type: ignore
 from django.views.generic import View # type: ignore
 from .models import DistrictChoices,CourseChoices,BatchChoices,TrainerChoices
-from .utility import get_admission_number,get_password
+from .utility import get_admission_number,get_password,send_email
 from .models import Students
 from .forms import StudentRegisterform
 from django.db.models import Q
@@ -10,6 +10,12 @@ from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from authentication.permissions import permission_roles
+import threading
+import datetime
+from payments.models import Payment
+
+
+
 
 # Create your views here.
 
@@ -100,7 +106,9 @@ class StudentRegistrationView(View):
         
       
         
-        form = StudentRegisterform
+        form = StudentRegisterform()
+        
+        
         
         # data = {'districts':DistrictChoices,'courses':CourseChoices,'batches':BatchChoices,'trainers':TrainerChoices,'forms':form}
         
@@ -110,6 +118,8 @@ class StudentRegistrationView(View):
     def post(self,request,*args,**kwargs):
         
         form = StudentRegisterform(request.POST,request.FILES)
+        
+       
         
         if form.is_valid():
             
@@ -130,8 +140,36 @@ class StudentRegistrationView(View):
                 student.profile = profile
                 
                 student.save()
-            
-            return redirect('students-list')
+                
+                # payment section
+                
+                fee = student.course.offer_fee if student.course.offer_fee else student.course.fee
+                
+                Payment.objects.create(student=student,amount=fee)
+                
+                # sending login credentials to student through mail
+                
+                subject = 'Login credentials'
+                
+                recepients = student.email
+                
+                template = 'email/login-credentials.html'
+                
+                join_date = student.join_date
+                
+                date_after_10_days =join_date + datetime.timedelta(days=10)
+                
+                context = {'name':f'{student.first_name} {student.last_name}','username':username,'password':password,'date_after_10_days':date_after_10_days}
+                
+                #send_email(subject,recepients,template,context)
+                
+                thread =threading.Thread(target=send_email,args=(subject,recepients,template,context))
+                
+                thread.start()
+               
+                
+                
+                return redirect('students-list')
         else:
             data ={'forms':form}
             return render(request,'students/course.html',context=data)
