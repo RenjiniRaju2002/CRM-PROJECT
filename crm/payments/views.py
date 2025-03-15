@@ -80,7 +80,7 @@ import datetime
 
 class StudentPaymentView(View):
 
-    def get(self,request,args,*kwargs):
+    def get(self,request,*args,**kwargs):
 
         try:
 
@@ -96,7 +96,7 @@ class StudentPaymentView(View):
     
 class RazorPayView(View):
 
-    def get(self,request,args,*kwargs):
+    def get(self,request,*args,**kwargs):
 
         with transaction.atomic():
 
@@ -123,7 +123,7 @@ class RazorPayView(View):
 @method_decorator(csrf_exempt,name='dispatch')
 class PaymentVerifyView(View):
 
-    def post(self,request,args,*kwargs):
+    def post(self,request,*args,**kwargs):
 
         data = request.POST
 

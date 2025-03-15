@@ -27,7 +27,7 @@ urlpatterns = [
     path('',include('authentication.urls')),
     path('',include('recordings.urls')),
     path('',include('trainers.urls')),
-    path('payments',include('payments.urls')),
+    path('payments/',include('payments.urls')),
     
 ]
 
